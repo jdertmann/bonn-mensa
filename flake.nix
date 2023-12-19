@@ -4,8 +4,7 @@
 
   outputs = { self, nixpkgs }:
     let
-      supportedSystems =
-        [ "aarch64-darwin" "aarch64-linux" "x86_64-darwin" "x86_64-linux" ];
+      supportedSystems = [ "aarch64-darwin" "aarch64-linux" "x86_64-darwin" "x86_64-linux" ];
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
       nixpkgsFor = forAllSystems (system:
         import nixpkgs {
@@ -15,49 +14,54 @@
     in
     {
 
-      formatter = forAllSystems
-        (system: nixpkgsFor.${system}.nixpkgs-fmt);
+      formatter = forAllSystems (system: nixpkgsFor.${system}.nixpkgs-fmt);
 
-      overlays.default = final: prev:
-        let pkgs = nixpkgsFor.${final.system};
-        in {
+      devShells = forAllSystems (system: {
+        default = nixpkgsFor.${system}.callPackage
+          ({ mkShell, python3, ... }:
+            mkShell {
+              buildInputs = [
+                (python3.withPackages (p: with p; [
+                  colorama
+                  requests
+                ]))
+              ];
+            })
+          { };
+      });
 
-          bonn-mensa = pkgs.python3Packages.callPackage
-            ({ lib
-             , buildPythonApplication
+      overlays.default = final: prev: {
+        bonn-mensa = final.callPackage
+          ({ lib, python3 }:
 
-               # buildInputs
-             , setuptools
+            python3.pkgs.buildPythonApplication {
+              pname = "bonn-mensa";
+              version = "0.0.1";
+              pyproject = true;
 
-               # propagates
-             , colorama
-             , requests
-             }:
+              src = self;
 
-              buildPythonApplication {
-                pname = "bonn-mensa";
-                version = "0.0.1";
-                pyproject = true;
+              nativeBuildInputs = with python3.pkgs; [
+                setuptools
+              ];
 
-                src = self;
+              propagatedBuildInputs = with python3.pkgs; [
+                colorama
+                requests
+              ];
 
-                nativeBuildInputs = [ setuptools ];
+              pythonImportsCheck = [ "bonn_mensa" ];
 
-                propagatedBuildInputs = [ colorama requests ];
-
-                pythonImportsCheck = [ "bonn_mensa" ];
-
-                meta = with lib; {
-                  description = "Meal plans for university canteens in Bonn";
-                  homepage = "https://github.com/alexanderwallau/bonn-mensa";
-                  license = licenses.mit;
-                  maintainers = with maintainers; [ alexanderwallau MayNiklas ];
-                  mainProgram = "mensa";
-                };
-              })
-            { };
-
-        };
+              meta = with lib; {
+                description = "Meal plans for university canteens in Bonn";
+                homepage = "https://github.com/alexanderwallau/bonn-mensa";
+                license = licenses.mit;
+                maintainers = with maintainers; [ alexanderwallau MayNiklas ];
+                mainProgram = "mensa";
+              };
+            })
+          { };
+      };
 
       packages = forAllSystems (system:
         let pkgs = nixpkgsFor.${system}; in {
