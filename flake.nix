@@ -15,7 +15,8 @@
     in
     {
 
-      formatter = forAllSystems (system: nixpkgsFor.${system}.nixpkgs-fmt);
+      formatter = forAllSystems
+        (system: nixpkgsFor.${system}.nixpkgs-fmt);
 
       overlays.default = final: prev:
         let pkgs = nixpkgsFor.${final.system};
@@ -59,8 +60,7 @@
         };
 
       packages = forAllSystems (system:
-        let pkgs = nixpkgsFor.${system};
-        in {
+        let pkgs = nixpkgsFor.${system}; in {
           default = pkgs.bonn-mensa;
           bonn-mensa = pkgs.bonn-mensa;
         });
