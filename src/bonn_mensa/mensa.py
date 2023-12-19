@@ -1,11 +1,15 @@
 import argparse
 import sys
 from html.parser import HTMLParser
-from typing import Dict, List, Optional, Set
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Set
 
 import requests
-from colorama import Fore, Style
+from colorama import Fore
 from colorama import init as colorama_init
+from colorama import Style
 
 # simulates relative imports for the case where this script is run directly from the command line
 # -> behaves as if it was run as `python -m bonn_mensa.mensa`
@@ -19,8 +23,7 @@ if __package__ is None and not hasattr(sys, "frozen"):
 import bonn_mensa.version
 
 meat_allergens: Dict[str, Set[str]] = {
-    "de": set(
-        [
+    "de": {
             "Krebstiere (41)",
             "Fisch (43)",
             "Weichtiere (53)",
@@ -30,10 +33,8 @@ meat_allergens: Dict[str, Set[str]] = {
             "Lammfleisch (L)",
             "Geflügel (G)",
             "Fisch (F)",
-        ]
-    ),
-    "en": set(
-        [
+    },
+    "en": {
             "crustaceans (41)",
             "fish (43)",
             "mollusks (53)",
@@ -43,24 +44,19 @@ meat_allergens: Dict[str, Set[str]] = {
             "lamb (L)",
             "poultry (G)",
             "fish (F)",
-        ]
-    ),
+    },
 
 }
 
 ovo_lacto_allergens = {
-    "de": set(
-        [
+    "de": {
             "Eier (42)",
             "Milch (46)",
-        ]
-    ),
-    "en": set(
-        [
+    },
+    "en": {
             "eggs (42)",
             "milk (46)"
-        ]
-    )
+    }
 }
 
 other_allergens: Dict[str, Set[str]] = {
@@ -255,7 +251,8 @@ class SimpleMensaResponseParser(HTMLParser):
             elif data == content_strings["PRICE_CATEGORY_GUEST"][self.lang]:
                 self.mode = "NEW_PRICE_GUEST"
             else:
-                raise NotImplementedError(f"Mode NEW_PRICE_CAT with data {data}")
+                raise NotImplementedError(
+                    f"Mode NEW_PRICE_CAT with data {data}")
         elif self.mode == "NEW_PRICE_STUDENT":
             assert self.last_nonignored_tag == "td"
             self.curr_meal.student_price = self.parse_price(data)
@@ -266,7 +263,8 @@ class SimpleMensaResponseParser(HTMLParser):
             assert self.last_nonignored_tag == "td"
             self.curr_meal.guest_price = self.parse_price(data)
         else:
-            raise NotImplementedError(f"{self.last_nonignored_tag} with data {data}")
+            raise NotImplementedError(
+                f"{self.last_nonignored_tag} with data {data}")
 
     def close(self):
         super().close()
@@ -365,11 +363,14 @@ def query_mensa(
         print(f"| {output_strs['MD_TABLE_COL_MEAL'][language]}", end="")
         print(f"| {output_strs['MD_TABLE_COL_PRICE'][language]}", end="")
         if show_all_allergens:
-            print(f"| {output_strs['MD_TABLE_COL_ALLERGENS'][language]}", end="")
+            print(
+                f"| {output_strs['MD_TABLE_COL_ALLERGENS'][language]}", end="")
         else:
-            print(f"| {output_strs['MD_TABLE_COL_SOME_ALLERGENS'][language]}", end="")
+            print(
+                f"| {output_strs['MD_TABLE_COL_SOME_ALLERGENS'][language]}", end="")
         if show_additives:
-            print(f"| {output_strs['MD_TABLE_COL_ADDITIVES'][language]}", end="")
+            print(
+                f"| {output_strs['MD_TABLE_COL_ADDITIVES'][language]}", end="")
         print("|")
         print(f"| :-- | :-- | --: | :-- | ", end="")
         if show_additives:
@@ -420,7 +421,8 @@ def query_mensa(
                     end="",
                 )
                 if meal.allergens and (
-                    show_all_allergens or set(meal.allergens) & interesting_allergens
+                    show_all_allergens or set(
+                        meal.allergens) & interesting_allergens
                 ):
                     if show_all_allergens:
                         allergen_str = ", ".join(meal.allergens)
