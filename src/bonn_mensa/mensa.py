@@ -1,10 +1,22 @@
 import argparse
+import sys
 from html.parser import HTMLParser
 from typing import Dict, List, Optional, Set
 
 import requests
 from colorama import Fore, Style
 from colorama import init as colorama_init
+
+# simulates relative imports for the case where this script is run directly from the command line
+# -> behaves as if it was run as `python -m bonn_mensa.mensa`
+# -> always behaves if it was installed as a package
+if __package__ is None and not hasattr(sys, "frozen"):
+    import os.path
+
+    path = os.path.realpath(os.path.abspath(__file__))
+    sys.path.insert(0, os.path.dirname(os.path.dirname(path)))
+
+import bonn_mensa.version
 
 meat_allergens: Dict[str, Set[str]] = {
     "de": set(
@@ -484,6 +496,12 @@ def get_parser():
         "--markdown",
         action="store_true",
         help="Output in markdown table format.",
+    )
+
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"bonn-mensa v{bonn_mensa.version.__version__} (https://github.com/alexanderwallau/bonn-mensa)",
     )
 
     return parser

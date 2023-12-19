@@ -36,7 +36,10 @@
 
             python3.pkgs.buildPythonApplication {
               pname = "bonn-mensa";
-              version = "0.0.1";
+              version = (lib.strings.removePrefix ''__version__ = "'' (lib.strings.removeSuffix ''"
+              ''
+                (builtins.readFile "${self}/src/bonn_mensa/version.py")
+              ));
               pyproject = true;
 
               src = self;
