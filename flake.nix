@@ -18,9 +18,10 @@
 
       devShells = forAllSystems (system: {
         default = nixpkgsFor.${system}.callPackage
-          ({ mkShell, python3, ... }:
+          ({ mkShell, python3, pre-commit, ... }:
             mkShell {
               buildInputs = [
+                pre-commit
                 (python3.withPackages (p: with p; [
                   colorama
                   requests
