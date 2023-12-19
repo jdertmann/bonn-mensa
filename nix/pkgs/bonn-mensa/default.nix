@@ -12,7 +12,7 @@
 
 buildPythonApplication {
   pname = "bonn-mensa";
-  version = "0.0.1-dev";
+  version = "0.0.1";
   pyproject = true;
 
   src = self;
