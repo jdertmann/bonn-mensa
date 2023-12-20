@@ -24,39 +24,35 @@ import bonn_mensa.version
 
 meat_allergens: Dict[str, Set[str]] = {
     "de": {
-            "Krebstiere (41)",
-            "Fisch (43)",
-            "Weichtiere (53)",
-            "Kalbfleisch (K)",
-            "Schweinefleisch (S)",
-            "Rindfleisch (R)",
-            "Lammfleisch (L)",
-            "Geflügel (G)",
-            "Fisch (F)",
+        "Krebstiere (41)",
+        "Fisch (43)",
+        "Weichtiere (53)",
+        "Kalbfleisch (K)",
+        "Schweinefleisch (S)",
+        "Rindfleisch (R)",
+        "Lammfleisch (L)",
+        "Geflügel (G)",
+        "Fisch (F)",
     },
     "en": {
-            "crustaceans (41)",
-            "fish (43)",
-            "mollusks (53)",
-            "veal (K)",
-            "pork (S)",
-            "beef (R)",
-            "lamb (L)",
-            "poultry (G)",
-            "fish (F)",
+        "crustaceans (41)",
+        "fish (43)",
+        "mollusks (53)",
+        "veal (K)",
+        "pork (S)",
+        "beef (R)",
+        "lamb (L)",
+        "poultry (G)",
+        "fish (F)",
     },
-
 }
 
 ovo_lacto_allergens = {
     "de": {
-            "Eier (42)",
-            "Milch (46)",
+        "Eier (42)",
+        "Milch (46)",
     },
-    "en": {
-            "eggs (42)",
-            "milk (46)"
-    }
+    "en": {"eggs (42)", "milk (46)"},
 }
 
 other_allergens: Dict[str, Set[str]] = {
@@ -251,8 +247,7 @@ class SimpleMensaResponseParser(HTMLParser):
             elif data == content_strings["PRICE_CATEGORY_GUEST"][self.lang]:
                 self.mode = "NEW_PRICE_GUEST"
             else:
-                raise NotImplementedError(
-                    f"Mode NEW_PRICE_CAT with data {data}")
+                raise NotImplementedError(f"Mode NEW_PRICE_CAT with data {data}")
         elif self.mode == "NEW_PRICE_STUDENT":
             assert self.last_nonignored_tag == "td"
             self.curr_meal.student_price = self.parse_price(data)
@@ -263,8 +258,7 @@ class SimpleMensaResponseParser(HTMLParser):
             assert self.last_nonignored_tag == "td"
             self.curr_meal.guest_price = self.parse_price(data)
         else:
-            raise NotImplementedError(
-                f"{self.last_nonignored_tag} with data {data}")
+            raise NotImplementedError(f"{self.last_nonignored_tag} with data {data}")
 
     def close(self):
         super().close()
@@ -346,7 +340,11 @@ def query_mensa(
     if not queried_categories:
         return
 
-    interesting_allergens = meat_allergens[language] | ovo_lacto_allergens[language] | other_allergens[language]
+    interesting_allergens = (
+        meat_allergens[language]
+        | ovo_lacto_allergens[language]
+        | other_allergens[language]
+    )
 
     if filter_mode is None:
         remove_allergens = set()
@@ -363,14 +361,11 @@ def query_mensa(
         print(f"| {output_strs['MD_TABLE_COL_MEAL'][language]}", end="")
         print(f"| {output_strs['MD_TABLE_COL_PRICE'][language]}", end="")
         if show_all_allergens:
-            print(
-                f"| {output_strs['MD_TABLE_COL_ALLERGENS'][language]}", end="")
+            print(f"| {output_strs['MD_TABLE_COL_ALLERGENS'][language]}", end="")
         else:
-            print(
-                f"| {output_strs['MD_TABLE_COL_SOME_ALLERGENS'][language]}", end="")
+            print(f"| {output_strs['MD_TABLE_COL_SOME_ALLERGENS'][language]}", end="")
         if show_additives:
-            print(
-                f"| {output_strs['MD_TABLE_COL_ADDITIVES'][language]}", end="")
+            print(f"| {output_strs['MD_TABLE_COL_ADDITIVES'][language]}", end="")
         print("|")
         print(f"| :-- | :-- | --: | :-- | ", end="")
         if show_additives:
@@ -421,8 +416,7 @@ def query_mensa(
                     end="",
                 )
                 if meal.allergens and (
-                    show_all_allergens or set(
-                        meal.allergens) & interesting_allergens
+                    show_all_allergens or set(meal.allergens) & interesting_allergens
                 ):
                     if show_all_allergens:
                         allergen_str = ", ".join(meal.allergens)
