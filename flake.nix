@@ -23,6 +23,7 @@
               buildInputs = [
                 pre-commit
                 (python3.withPackages (p: with p; [
+                  black
                   colorama
                   requests
                 ]))
