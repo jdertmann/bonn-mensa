@@ -39,11 +39,11 @@ jobs:
 
       - name: Bump version in Formula/crab_share.rb
         run: |
-          sed -i 's|\(github\.com/alexanderwallau/bonn-mensa/archive/refs/tags/\).*\.tar\.gz|\1${{ steps.get_tag_name.outputs.tag_name }}.tar.gz|' Formula/bonn_mensa.rb
+          sed -i 's|\(github\.com/alexanderwallau/bonn-mensa/archive/refs/tags/\).*\.tar\.gz|\1${{ steps.get_tag_name.outputs.tag_name }}.tar.gz|' Formula/bonn-mensa.rb
 
-      - name: Bump sha256 in Formula/bonn_mensa.rb
+      - name: Bump sha256 in Formula/bonn-mensa.rb
         run: |
-          sed -i "s/sha256 \"[^\"]*\"/sha256 \"${{ steps.get_sha256.outputs.sha256 }}\"/" Formula/bonn_mensa.rb
+          sed -i "s/sha256 \"[^\"]*\"/sha256 \"${{ steps.get_sha256.outputs.sha256 }}\"/" Formula/bonn-mensa.rb
 
       - name: Commit changes to git
         run: |
