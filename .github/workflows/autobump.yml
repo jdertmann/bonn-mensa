@@ -43,7 +43,7 @@ jobs:
 
       - name: Bump sha256 in Formula/bonn-mensa.rb
         run: |
-          sed -i "s/sha256 \"[^\"]*\"/sha256 \"${{ steps.get_sha256.outputs.sha256 }}\"/" Formula/bonn-mensa.rb
+          sed -i "0,/sha256 \"[^\"]*\"/s//sha256 \"${{ steps.get_sha256.outputs.sha256 }}\"/" Formula/bonn-mensa.rb
 
       - name: Commit changes to git
         run: |
