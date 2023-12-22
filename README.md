@@ -15,6 +15,29 @@ To install this script, run
 $ pip install git+https://github.com/felixblanke/bonn-mensa.git
 ```
 
+### MacOS (using homebrew)
+
+To install the application using homebrew, run:
+
+```bash
+# Add the tap to homebrew
+brew tap --force-auto-update alexanderwallau/bonn-mensa https://github.com/alexanderwallau/bonn-mensa
+
+# Install the application
+brew install bonn-mensa
+
+# Install the application from main branch
+brew install --HEAD bonn-mensa 
+```
+
+In case you want to remove the application, run:
+
+```bash
+brew uninstall bonn-mensa
+brew untap alexanderwallau/bonn-mensa
+brew autoremove
+```
+
 ## Usage
 
 To run the script, simply run `mensa`. For a list of all arguments, see `mensa --help`
