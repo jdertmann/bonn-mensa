@@ -4,15 +4,14 @@ A python script for displaying the meal plans of the canteens of the [Studierend
 The script parses the HTML response of a call to an API.
 Depending on your request the API might take a few seconds to respond.
 
-
 ![an example output](images/bonn-mensa_example_output.png)
-
 
 ## Installation
 
 To install this script, run
+
 ```sh
-$ pip install git+https://github.com/felixblanke/bonn-mensa.git
+ pip install bonn-mensa
 ```
 
 ### MacOS (using homebrew)
