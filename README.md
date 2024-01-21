@@ -61,4 +61,5 @@ optional arguments:
   --show-additives      Show additives.
   --no-colors           Do not use any ANSI colors in the output.
   --markdown            Output in markdown table format.
+  --verbose             Output Debug Log
 ```
