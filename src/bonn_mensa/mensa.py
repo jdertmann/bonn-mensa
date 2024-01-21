@@ -1,4 +1,5 @@
 import argparse
+from ast import parse
 import sys
 from html.parser import HTMLParser
 from typing import Dict
@@ -495,6 +496,12 @@ def get_parser():
     )
 
     parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Print debug output.",
+    )
+
+    parser.add_argument(
         "--version",
         action="version",
         version=f"bonn-mensa v{bonn_mensa.version.__version__} (https://github.com/alexanderwallau/bonn-mensa)",
@@ -521,6 +528,7 @@ def run_cmd(args):
         show_additives=args.show_additives,
         colors=not args.no_colors,
         markdown_output=args.markdown,
+        verbose=args.verbose,
     )
 
 
