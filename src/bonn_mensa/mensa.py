@@ -69,6 +69,7 @@ canteen_id_dict = {
     "VenusbergBistro": "6",
     "CasinoZEF/ZEI": "8",
     "Foodtruck": "19",
+    "Rabinstraße": "21",
 }
 
 language_id_dict = {
@@ -315,7 +316,6 @@ def query_mensa(
         print(
             f"Querying for {date=}, {canteen=}, {filtered_categories=}, {filter_mode=}, {url=}"
         )
-
     r = requests.post(
         url,
         data={
