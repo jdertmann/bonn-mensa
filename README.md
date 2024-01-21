@@ -51,7 +51,7 @@ optional arguments:
   -h, --help            show this help message and exit
   --vegan               Only show vegan options
   --vegetarian          Only show vegetarian options
-  --mensa {SanktAugustin,CAMPO,Hofgarten,FoodtruckRheinbach,VenusbergBistro,CasinoZEF/ZEI,Foodtruck}
+  --mensa {SanktAugustin,CAMPO,Hofgarten,FoodtruckRheinbach,VenusbergBistro,CasinoZEF/ZEI,Foodtruck, Rabinstraße}
                         The canteen to query. Defaults to CAMPO.
   --filter-categories [CATEGORY ...]
                         Meal categories to hide. Defaults to ['Buffet', 'Dessert'].
