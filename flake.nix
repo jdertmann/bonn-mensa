@@ -53,6 +53,7 @@
               propagatedBuildInputs = with python3.pkgs; [
                 colorama
                 requests
+                lxml
               ];
 
               pythonImportsCheck = [ "bonn_mensa" ];
