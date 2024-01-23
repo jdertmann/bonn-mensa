@@ -1,6 +1,6 @@
 import argparse
-from ast import parse
 import sys
+from ast import parse
 from html.parser import HTMLParser
 from typing import Dict
 from typing import List
