@@ -1,5 +1,9 @@
 # Meal plans for university canteens in Bonn
 
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/alexanderwallau/bonn-mensa/python-publish.yml)
+[![PyPI version](https://badge.fury.io/py/bonn-mensa.svg)](https://badge.fury.io/py/bonn-mensa)
+[![FlakeHub](https://img.shields.io/endpoint?url=https://flakehub.com/f/alexanderwallau/bonn-mensa/badge)](https://flakehub.com/flake/alexanderwallau/bonn-mensa)
+
 A python script for displaying the meal plans of the canteens of the [Studierendenwerk Bonn](https://www.studierendenwerk-bonn.de/).
 The script parses the HTML response of a call to an API.
 Depending on your request the API might take a few seconds to respond.
@@ -55,7 +59,11 @@ bonn-mensa = {
     };
 ```
 
-to your flake.nix and adjust the rest of your config accordingly if you are using Home-Manager an example can be found [here](https://github.com/alexanderwallau/nix).
+to your flake.nix and adjust the rest of your config accordingly if you are using Home-Manager an example can be found [here](https://github.com/alexanderwallau/nix). One could also use the flakehub route and use
+
+```nix
+fh add "alexanderwallau/bonn-mensa/0.1.81"
+```
 
 ## Usage
 
