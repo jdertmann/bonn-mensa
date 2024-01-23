@@ -37,13 +37,34 @@ brew untap alexanderwallau/bonn-mensa
 brew autoremove
 ```
 
+### NixOS (using flakes)
+
+This Repository provides a flake. If you have flakes enabled you can either run
+
+```nix
+nix run github:alexanderwallau/bonn-mensa -- <options>
+```
+
+for one time use.
+If you want to add this to your permanent configuration add
+
+```nix
+bonn-mensa = {
+      url = "github:alexanderwallau/bonn-mensa";
+      inputs = { nixpkgs.follows = "nixpkgs"; };
+    };
+```
+
+to your flake.nix and adjust the rest of your config accordingly if you are using Home-Manager an example can be found [here](https://github.com/alexanderwallau/nix).
+
 ## Usage
 
 To run the script, simply run `mensa`. For a list of all arguments, see `mensa --help`
-```
+
+```bash
 $ mensa --help
 usage: mensa [-h] [--vegan | --vegetarian]
-             [--mensa {SanktAugustin,CAMPO,Hofgarten,FoodtruckRheinbach,VenusbergBistro,CasinoZEF/ZEI,Foodtruck}]
+             [--mensa {SanktAugustin,CAMPO,Hofgarten,FoodtruckRheinbach,VenusbergBistro,CasinoZEF/ZEI,Foodtruck, Rabinstraße}]
              [--filter-categories [CATEGORY ...]] [--date DATE] [--lang {de,en}] [--show-all-allergens]
              [--show-additives] [--no-colors] [--markdown]
 
