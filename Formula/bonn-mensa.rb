@@ -3,8 +3,8 @@ class BonnMensa < Formula
 
   desc "Meal plans for university canteens in Bonn"
   homepage "https://github.com/alexanderwallau/bonn-mensa"
-  url "https://github.com/alexanderwallau/bonn-mensa/archive/refs/tags/0.0.3.tar.gz"
-  sha256 "5d5819989c4f638ba4f940e91e85564cfbe078321e8e30f06489d3ad17c4efdf"
+  url "https://github.com/alexanderwallau/bonn-mensa/archive/refs/tags/0.0.4.tar.gz"
+  sha256 "c79974cc55b3b11ee23a742b9d73a7ac6f05f08ec27c61fa5ffa173c2faf2582"
   license "MIT"
 
   head do
