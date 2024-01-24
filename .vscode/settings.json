@@ -1,5 +1,10 @@
 {
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter"
-    }
+    },
+    "cSpell.words": [
+        "catname",
+        "Fisch",
+        "Krebstiere"
+    ]
 }
