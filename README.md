@@ -72,7 +72,8 @@ To run the script, simply run `mensa`. For a list of all arguments, see `mensa -
 ```bash
 $ mensa --help
 usage: mensa [-h] [--vegan | --vegetarian]
-             [--mensa {SanktAugustin,CAMPO,Hofgarten,FoodtruckRheinbach,VenusbergBistro,CasinoZEF/ZEI,Foodtruck, Rabinstraße}]
+             [--mensa {SanktAugustin, CAMPO, Hofgarten, FoodtruckRheinbach, VenusbergBistro, CasinoZEF/ZEI, Foodtruck, Rabinstraße}]
+             [-- price {Student, Staff, Guest}]
              [--filter-categories [CATEGORY ...]] [--date DATE] [--lang {de,en}] [--show-all-allergens]
              [--show-additives] [--no-colors] [--markdown]
 
@@ -82,6 +83,8 @@ optional arguments:
   --vegetarian          Only show vegetarian options
   --mensa {SanktAugustin,CAMPO,Hofgarten,FoodtruckRheinbach,VenusbergBistro,CasinoZEF/ZEI,Foodtruck, Rabinstraße}
                         The canteen to query. Defaults to CAMPO.
+  --price {Student, Staff, Guest}
+          The price to display on output defaults to Student
   --filter-categories [CATEGORY ...]
                         Meal categories to hide. Defaults to ['Buffet', 'Dessert'].
   --date DATE           The date to query for in YYYY-MM-DD format. Defaults to today.

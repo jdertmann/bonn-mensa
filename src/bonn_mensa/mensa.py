@@ -277,6 +277,7 @@ def query_mensa(
     show_additives: bool = False,
     url: str = "https://www.studierendenwerk-bonn.de/index.php?ajax=meals",
     verbose: bool = False,
+    price: str = "Student",
     colors: bool = True,
     markdown_output: bool = False,
 ) -> None:
@@ -388,8 +389,12 @@ def query_mensa(
                     print(f"| |", end="")
                 else:
                     print(f"| {cat.title} |", end="")
-
-                print(f" {meal.title} | {meal.student_price/100:.2f}€ |", end="")
+                if price == "Student":
+                    print(f" {meal.title} | {meal.student_price/100:.2f}€ |", end="")
+                if price == "Staff":
+                    print(f" {meal.title} | {meal.staff_price/100:.2f}€ |", end="")
+                if price == "Guest":
+                    print(f" {meal.title} | {meal.guest_price/100:.2f}€ |", end="")
 
                 if show_all_allergens:
                     allergen_str = ", ".join(meal.allergens)
@@ -412,10 +417,21 @@ def query_mensa(
                 # do not indent first line
                 if meal_idx:
                     print(" " * (maxlen_catname + 1), end="")
-                print(
-                    f"{MEAL_COLOR}{meal.title} {PRICE_COLOR}({meal.student_price/100:.2f}€)",
-                    end="",
-                )
+                if price == "Student":
+                    print(
+                        f"{MEAL_COLOR}{meal.title} {PRICE_COLOR}({meal.student_price/100:.2f}€)",
+                        end="",
+                    )
+                if price == "Staff":
+                    print(
+                        f"{MEAL_COLOR}{meal.title} {PRICE_COLOR}({meal.staff_price/100:.2f}€)",
+                        end="",
+                    )
+                if price == "Guest":
+                    print(
+                        f"{MEAL_COLOR}{meal.title} {PRICE_COLOR}({meal.guest_price/100:.2f}€)",
+                        end="",
+                    )
                 if meal.allergens and (
                     show_all_allergens or set(meal.allergens) & interesting_allergens
                 ):
@@ -462,6 +478,13 @@ def get_parser():
         type=str,
         default=None,
         help="The date to query for in YYYY-MM-DD format. Defaults to today.",
+    )
+    parser.add_argument(
+        "--price",
+        type=str,
+        choices=["Student", "Staff", "Guest"],
+        default="Student",
+        help="The price category to show. Defaults to Student.",
     )
 
     parser.add_argument(
@@ -529,6 +552,7 @@ def run_cmd(args):
         colors=not args.no_colors,
         markdown_output=args.markdown,
         verbose=args.verbose,
+        price=args.price,
     )
 
 
