@@ -11,6 +11,9 @@ import requests
 from colorama import Fore
 from colorama import init as colorama_init
 from colorama import Style
+import xml.etree.ElementTree as ET
+
+import xml
 
 # simulates relative imports for the case where this script is run directly from the command line
 # -> behaves as if it was run as `python -m bonn_mensa.mensa`
@@ -54,6 +57,21 @@ ovo_lacto_allergens = {
         "Milch (46)",
     },
     "en": {"eggs (42)", "milk (46)"},
+}
+gluten_allergens = {
+"de": {
+    "Gluten (40)",
+    "Weizen (40a)",
+    "Roggen (40b)",
+    "Gerste (40c)",
+
+},
+"en": {
+    "gluten (40)",
+    "wheat (40a)",
+    "rye (40b)",
+    "barley (40c)",
+},
 }
 
 other_allergens: Dict[str, Set[str]] = {
@@ -275,11 +293,14 @@ def query_mensa(
     filter_mode: Optional[str] = None,
     show_all_allergens: bool = False,
     show_additives: bool = False,
+    gluten_free: bool = False,
     url: str = "https://www.studierendenwerk-bonn.de/index.php?ajax=meals",
     verbose: bool = False,
     price: str = "Student",
     colors: bool = True,
     markdown_output: bool = False,
+    xml_output: bool = False,
+
 ) -> None:
     if date is None:
         from datetime import datetime
@@ -354,8 +375,12 @@ def query_mensa(
         remove_allergens = meat_allergens[language]
     elif filter_mode == "vegan":
         remove_allergens = meat_allergens[language] | ovo_lacto_allergens[language]
+
     else:
         raise NotImplementedError(filter_mode)
+
+    if gluten_free:
+        remove_allergens.update(gluten_allergens[language])
 
     maxlen_catname = max(len(cat.title) for cat in queried_categories)
     if markdown_output:
@@ -477,7 +502,7 @@ def get_parser():
         "--date",
         type=str,
         default=None,
-        help="The date to query for in YYYY-MM-DD format. Defaults to today.",
+        help="The date to query for in YYYY -MM-DD format. Defaults to today.",
     )
     parser.add_argument(
         "--price",
@@ -530,6 +555,17 @@ def get_parser():
         version=f"bonn-mensa v{bonn_mensa.version.__version__} (https://github.com/alexanderwallau/bonn-mensa)",
     )
 
+    parser.add_argument(
+        "--xml",
+        action="store_true",
+        help="""Save canteen pan with all allergens as xml. If no filename is given the resulting
+            xml will be saved as <canteen name>_<time>.""",
+    )
+    parser.add_argument(
+        "--glutenfree",
+        action="store_true",
+        help="Only show gluten free options",
+    )
     return parser
 
 
@@ -549,10 +585,13 @@ def run_cmd(args):
         filter_mode=filter_mode,
         show_all_allergens=args.show_all_allergens,
         show_additives=args.show_additives,
+        gluten_free=args.glutenfree,
         colors=not args.no_colors,
         markdown_output=args.markdown,
         verbose=args.verbose,
         price=args.price,
+        xml_output=args.xml,
+
     )
 
 
