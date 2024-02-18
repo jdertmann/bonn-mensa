@@ -30,7 +30,7 @@ brew tap --force-auto-update alexanderwallau/bonn-mensa https://github.com/alexa
 brew install bonn-mensa
 
 # Install the application from main branch
-brew install --HEAD bonn-mensa 
+brew install --HEAD bonn-mensa
 ```
 
 In case you want to remove the application, run:
@@ -76,6 +76,7 @@ usage: mensa [-h] [--vegan | --vegetarian]
              [-- price {Student, Staff, Guest}]
              [--filter-categories [CATEGORY ...]] [--date DATE] [--lang {de,en}] [--show-all-allergens]
              [--show-additives] [--no-colors] [--markdown]
+             [--glutenfree]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -91,6 +92,7 @@ optional arguments:
   --lang {de,en}        The language of the meal plan to query. Defaults to German.
   --show-all-allergens  Show all allergens. By default, only allergens relevant to vegans (e.g. milk or fish) are shown.
   --show-additives      Show additives.
+  --glutenfree          Show only gluten free meals
   --no-colors           Do not use any ANSI colors in the output.
   --markdown            Output in markdown table format.
   --verbose             Output Debug Log
