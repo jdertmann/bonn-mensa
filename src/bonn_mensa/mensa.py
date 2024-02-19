@@ -2,15 +2,10 @@ import argparse
 import sys
 from ast import parse
 from html.parser import HTMLParser
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Set
+from typing import Dict, List, Optional, Set
 
 import requests
-from colorama import Fore
-from colorama import init as colorama_init
-from colorama import Style
+from colorama import Fore, Style, init as colorama_init
 import xml.etree.ElementTree as ET
 
 import xml
@@ -58,6 +53,7 @@ ovo_lacto_allergens = {
     },
     "en": {"eggs (42)", "milk (46)"},
 }
+
 gluten_allergens = {
 "de": {
     "Gluten (40)",
@@ -303,9 +299,14 @@ def query_mensa(
 
 ) -> None:
     if date is None:
-        from datetime import datetime
+        # If no date is provided use today's date or the next working day (if today is a weekend or public holiday in NRW)
+        import datetime
+        import holidays
+        public_holidays = holidays.DE(subdiv='NW')
+        date = datetime.date.today()
+        if date.isoweekday() in set((6, 7)):
+            date += datetime.timedelta(days=8 - date.isoweekday())
 
-        date = datetime.today().strftime("%Y-%m-%d")
 
     if colors:
         QUERY_COLOR = Fore.MAGENTA
@@ -375,7 +376,6 @@ def query_mensa(
         remove_allergens = meat_allergens[language]
     elif filter_mode == "vegan":
         remove_allergens = meat_allergens[language] | ovo_lacto_allergens[language]
-
     else:
         raise NotImplementedError(filter_mode)
 
