@@ -7,8 +7,10 @@ from typing import Dict, List, Optional, Set
 import requests
 from colorama import Fore, Style, init as colorama_init
 import xml.etree.ElementTree as ET
-
 import xml
+
+import datetime
+import holidays
 
 # simulates relative imports for the case where this script is run directly from the command line
 # -> behaves as if it was run as `python -m bonn_mensa.mensa`
@@ -55,19 +57,19 @@ ovo_lacto_allergens = {
 }
 
 gluten_allergens = {
-"de": {
-    "Gluten (40)",
-    "Weizen (40a)",
-    "Roggen (40b)",
-    "Gerste (40c)",
+    "de": {
+        "Gluten (40)",
+        "Weizen (40a)",
+        "Roggen (40b)",
+        "Gerste (40c)",
 
-},
-"en": {
-    "gluten (40)",
-    "wheat (40a)",
-    "rye (40b)",
-    "barley (40c)",
-},
+    },
+    "en": {
+        "gluten (40)",
+        "wheat (40a)",
+        "rye (40b)",
+        "barley (40c)",
+    },
 }
 
 other_allergens: Dict[str, Set[str]] = {
@@ -281,6 +283,17 @@ class SimpleMensaResponseParser(HTMLParser):
         self.start_new_category()
 
 
+
+def get_mensa_data() -> datetime.date:
+    print("Fetching mensa data...")
+    public_holidays = holidays.DE(subdiv='NW')
+    date = datetime.date.today()
+    while date in public_holidays:
+        date += datetime.timedelta(days=1)
+        if date.isoweekday() in set((6, 7)):
+            date += datetime.timedelta(days=8 - date.isoweekday())
+    return date
+
 def query_mensa(
     date: Optional[str],
     canteen: str,
@@ -299,14 +312,9 @@ def query_mensa(
 
 ) -> None:
     if date is None:
-        # If no date is provided use today's date or the next working day (if today is a weekend or public holiday in NRW)
-        import datetime
-        import holidays
-        public_holidays = holidays.DE(subdiv='NW')
-        date = datetime.date.today()
-        if date.isoweekday() in set((6, 7)):
-            date += datetime.timedelta(days=8 - date.isoweekday())
-
+        # If no date is provided get next valid day i.E. working days from monday to fridy
+        # this does not take into account closures due to operational closure
+        date = get_mensa_data()
 
     if colors:
         QUERY_COLOR = Fore.MAGENTA
