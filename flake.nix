@@ -25,7 +25,6 @@
                 (python3.withPackages (p: with p; [
                   black
                   colorama
-                  lxml
                   requests
                 ]))
               ];
@@ -56,7 +55,6 @@
                 propagatedBuildInputs = with python3.pkgs; [
                   colorama
                   holidays
-                  lxml
                   requests
                 ];
 

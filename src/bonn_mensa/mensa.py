@@ -5,8 +5,6 @@ from html.parser import HTMLParser
 import time
 from typing import Dict, List, Optional, Set
 
-from matplotlib import category
-from pyparsing import line
 import requests
 from colorama import Fore, Style, init as colorama_init
 import xml.etree.ElementTree as ET
