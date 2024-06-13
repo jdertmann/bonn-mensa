@@ -2,12 +2,15 @@ import argparse
 import sys
 from ast import parse
 from html.parser import HTMLParser
+import time
 from typing import Dict, List, Optional, Set
 
+from matplotlib import category
+from pyparsing import line
 import requests
 from colorama import Fore, Style, init as colorama_init
 import xml.etree.ElementTree as ET
-import xml
+
 
 import datetime
 import holidays
@@ -62,7 +65,6 @@ gluten_allergens = {
         "Weizen (40a)",
         "Roggen (40b)",
         "Gerste (40c)",
-
     },
     "en": {
         "gluten (40)",
@@ -278,21 +280,81 @@ class SimpleMensaResponseParser(HTMLParser):
         else:
             raise NotImplementedError(f"{self.last_nonignored_tag} with data {data}")
 
+    def to_xml(self, wCanteen) -> ET.Element:
+        # Define namespaces
+        ns = {
+            "": "http://openmensa.org/open-mensa-v2",
+            "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        }
+        # Register namespaces
+        for prefix, uri in ns.items():
+            ET.register_namespace(prefix, uri)
+
+        # Create the root element with namespaces
+        root = ET.Element(
+            "openmensa",
+            {
+                "version": "2.1",
+                "xmlns": ns[""],
+                "xmlns:xsi": ns["xsi"],
+                "xsi:schemaLocation": "http://openmensa.org/open-mensa-v2 http://openmensa.org/open-mensa-v2.xsd",
+            },
+        )
+        # Add version element
+        version = ET.SubElement(root, "version")
+        version.text = "5.04-4"
+
+        # Create the canteen and Date element
+        canteen = ET.SubElement(root, "canteen")
+        day = ET.SubElement(canteen, "day")
+        day.set("date", str(datetime.date.today()))
+
+        # Create the meals element
+
+        for cat in self.categories:
+            categories = ET.SubElement(day, "category")
+            categories.set("name", cat.title)
+            for meal in cat.meals:
+                meal_element = ET.SubElement(categories, "meal")
+                name = ET.SubElement(meal_element, "name")
+                name.text = meal.title
+                # Add allergens and Additives
+                allergens = ET.SubElement(meal_element, "note")
+                combined_list = meal.allergens + meal.additives
+                allergens.text = ", ".join(combined_list)
+                # Add prices
+                price = ET.SubElement(meal_element, "price")
+                price.set("role", "student")
+                price.text = str(f"{meal.student_price / 100:.2f}")
+                price = ET.SubElement(meal_element, "price")
+                price.set("role", "employee")
+                price.text = str(f"{meal.staff_price / 100:.2f}")
+                price = ET.SubElement(meal_element, "price")
+                price.set("role", "other")
+                price.text = str(f"{meal.guest_price / 100:.2f}")
+
+        return root
+
     def close(self):
         super().close()
         self.start_new_category()
 
 
-
 def get_mensa_data() -> datetime.date:
     print("Fetching mensa data...")
-    public_holidays = holidays.DE(subdiv='NW')
+    # Since the canteenes ar elocated in NRW get the public holidays for NRW
+    nrw_holidays = holidays.country_holidays("DE", subdiv="NW")
+
     date = datetime.date.today()
-    while date in public_holidays:
-        date += datetime.timedelta(days=1)
-        if date.isoweekday() in set((6, 7)):
-            date += datetime.timedelta(days=8 - date.isoweekday())
-    return date
+    # Initialize the next working day as the day after today
+    next_working_day = date + datetime.timedelta()
+
+    # Loop until we find a day that is not a weekend or a public holiday
+    while next_working_day.weekday() >= 5 or next_working_day in nrw_holidays:
+        next_working_day += datetime.timedelta(days=1)
+
+    return next_working_day
+
 
 def query_mensa(
     date: Optional[str],
@@ -309,12 +371,11 @@ def query_mensa(
     colors: bool = True,
     markdown_output: bool = False,
     xml_output: bool = False,
-
 ) -> None:
     if date is None:
         # If no date is provided get next valid day i.E. working days from monday to fridy
-        # this does not take into account closures due to operational closure
-        date = get_mensa_data()
+        # this does not take into account closures due to operational reasons
+        date = get_mensa_data().strftime("%Y-%m-%d")
 
     if colors:
         QUERY_COLOR = Fore.MAGENTA
@@ -481,6 +542,14 @@ def query_mensa(
                     print(f" {ADDITIVE_COLOR}[{additives_str}]", end="")
 
                 print(f"{RESET_COLOR}")
+        if xml_output:
+            xml_root = parser.to_xml(canteen)
+            xml_tree = ET.ElementTree(xml_root)
+            filename = f"{canteen}_{date}_{time.time()}.xml"
+            xml_tree.write(
+                filename, encoding="utf-8", xml_declaration=True, method="xml"
+            )
+            print(f"XML saved to {filename}")
 
 
 def get_parser():
@@ -599,7 +668,6 @@ def run_cmd(args):
         verbose=args.verbose,
         price=args.price,
         xml_output=args.xml,
-
     )
 
 
