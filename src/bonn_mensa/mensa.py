@@ -363,7 +363,7 @@ def query_mensa(
     show_all_allergens: bool = False,
     show_additives: bool = False,
     gluten_free: bool = False,
-    url: str = "https://www.studierendenwerk-bonn.de/index.php?ajax=meals",
+    url: str = "https://www.studierendenwerk-bonn.de/?type=1732731666",
     verbose: bool = False,
     price: str = "Student",
     colors: bool = True,
@@ -409,9 +409,9 @@ def query_mensa(
     r = requests.post(
         url,
         data={
-            "date": date,
-            "canteen": canteen_id_dict[canteen],
-            "L": language_id_dict[language],
+            "tx_festwb_mealsajax[date]": date,
+            "tx_festwb_mealsajax[canteen]": canteen_id_dict[canteen],
+            "tx_festwb_mealsajax[language]": language_id_dict[language],
         },
     )
     parser = SimpleMensaResponseParser(lang=language, verbose=verbose)
