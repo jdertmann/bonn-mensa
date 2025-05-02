@@ -1,9 +1,9 @@
 import argparse
 import sys
-from ast import parse
 from html.parser import HTMLParser
+import re
 import time
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Literal
 
 import requests
 from colorama import Fore, Style, init as colorama_init
@@ -149,8 +149,8 @@ output_strs = {
         "en": "Additives",
     },
     "MD_TABLE_COL_CO2": {
-        "de": "CO₂-Bilanz",
-        "en": "CO₂ Balance",
+        "de": "Emissionen (CO₂e)",
+        "en": "Emissions (CO₂e)",
     },
     "CO2_TAG_GREEN": {
         "de": "Mindestens 50% besser als der Durchschnitt",
@@ -175,7 +175,8 @@ class Meal:
         self.student_price: Optional[int] = None
         self.staff_price: Optional[int] = None
         self.guest_price: Optional[int] = None
-        self.co2_tag: Optional[str] = None
+        self.co2_emission: Optional[int] = None
+        self.co2_tag: Optional[Literal["CO2_TAG_GREEN", "CO2_TAG_RED", "CO2_TAG_ORANGE"]] = None
 
     def add_allergen(self, allergen: str) -> None:
         self.allergens.append(allergen)
@@ -229,13 +230,15 @@ class SimpleMensaResponseParser(HTMLParser):
 
     def handle_starttag(self, tag, attrs):
         # skip non-empty attributes
-        if attrs or tag not in ["h2", "h5", "strong", "p", "th", "td", "br"]:
+        if attrs or tag not in ["h2", "h3", "h5", "strong", "p", "th", "td", "br"]:
             self.mode = "IGNORE"
             return
 
         self.last_nonignored_tag = tag
         if tag == "h2":
             self.start_new_category()
+        elif tag == "h3":
+            self.mode = "CO2_EMISSION"
         elif tag == "h5":
             self.start_new_meal()
         elif tag == "strong":
@@ -276,6 +279,12 @@ class SimpleMensaResponseParser(HTMLParser):
                 self.mode = "IGNORE"
             else:
                 raise NotImplementedError(f"Mode NEW_INFOS with data {data}")
+        elif self.mode == "CO2_EMISSION":
+                match = re.match("^(\d+)g CO$", data)
+                if match:
+                    self.curr_meal.co2_emission = int(match.group(1))
+                else:
+                    raise NotImplementedError(f"Mode CO2_EMISSION with data {data}")
         elif self.mode == "NEW_ALLERGENS":
             if self.verbose:
                 print(f"\t\tAdding new allergen: {data}")
@@ -413,9 +422,9 @@ def query_mensa(
         WARN_COLOR = Fore.RED
         RESET_COLOR = Style.RESET_ALL
         CO2_COLORS = {
-            "CO2_TAG_GREEN": Fore.GREEN,
-            "CO2_TAG_ORANGE": Fore.YELLOW,
-            "CO2_TAG_RED": Fore.RED,
+            "CO2_TAG_GREEN": Fore.LIGHTGREEN_EX,
+            "CO2_TAG_ORANGE": Fore.LIGHTYELLOW_EX,
+            "CO2_TAG_RED": Fore.LIGHTRED_EX,
         }
     else:
         QUERY_COLOR = ""
@@ -542,7 +551,7 @@ def query_mensa(
                     print(f" {additives_str} |", end="")
 
                 if show_co2:
-                    co2_str = output_strs[meal.co2_tag][language] if meal.co2_tag else ''
+                    co2_str = f"{meal.co2_emission}g" if meal.co2_emission else ''
                     print(f" {co2_str} |", end="")
 
                 print("")
@@ -584,10 +593,9 @@ def query_mensa(
                     additives_str = ", ".join(meal.additives)
                     print(f" {ADDITIVE_COLOR}[{additives_str}]", end="")
 
-                if show_co2 and meal.co2_tag:
-                    co2_str = output_strs[meal.co2_tag][language]
+                if show_co2 and meal.co2_tag and meal.co2_emission:
                     color = CO2_COLORS[meal.co2_tag]
-                    print(f" {color}[CO₂: {co2_str}]", end="")
+                    print(f" {color}[{meal.co2_emission}g CO₂e]", end="")
 
                 print(f"{RESET_COLOR}")
         if xml_output:
